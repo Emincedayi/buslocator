@@ -102,11 +102,22 @@ export default async function Home() {
       <h2 className="text-xl font-bold mt-6 mb-4">Otobüs Tarifeleri</h2>
       <div className="max-h-96 overflow-y-auto border border-gray-200 rounded-lg p-4 mb-6">
         {busSchedules.map((schedule) => (
-          <div key={schedule._id} className="mb-4 pb-4 border-b border-gray-200">
-            <p><strong>Hat No:</strong> {schedule.HAT_NO}</p>
-            <p><strong>Tarife ID:</strong> {schedule.TARIFE_ID}</p>
-            <p><strong>Gidiş Saati:</strong> {schedule.GIDIS_SAATI}</p>
-            <p><strong>Dönüş Saati:</strong> {schedule.DONUS_SAATI}</p>
+          <div
+            key={schedule._id}
+            className="mb-4 pb-4 border-b border-gray-200"
+          >
+            <p>
+              <strong>Hat No:</strong> {schedule.HAT_NO}
+            </p>
+            <p>
+              <strong>Tarife ID:</strong> {schedule.TARIFE_ID}
+            </p>
+            <p>
+              <strong>Gidiş Saati:</strong> {schedule.GIDIS_SAATI}
+            </p>
+            <p>
+              <strong>Dönüş Saati:</strong> {schedule.DONUS_SAATI}
+            </p>
           </div>
         ))}
       </div>
@@ -114,11 +125,24 @@ export default async function Home() {
       <h2 className="text-xl font-bold mt-6 mb-4">Otobüs Duyuruları</h2>
       <div className="max-h-96 overflow-y-auto border border-gray-200 rounded-lg p-4 mb-6">
         {busAnnouncements.map((announcement) => (
-          <div key={announcement._id} className="mb-4 pb-4 border-b border-gray-200">
-            <p><strong>Hat No:</strong> {announcement.HAT_NO}</p>
-            <p><strong>Başlık:</strong> {announcement.BASLIK}</p>
-            <p><strong>Başlama Tarihi:</strong> {new Date(announcement.BASLAMA_TARIHI).toLocaleString()}</p>
-            <p><strong>Bitiş Tarihi:</strong> {new Date(announcement.BITIS_TARIHI).toLocaleString()}</p>
+          <div
+            key={announcement._id}
+            className="mb-4 pb-4 border-b border-gray-200"
+          >
+            <p>
+              <strong>Hat No:</strong> {announcement.HAT_NO}
+            </p>
+            <p>
+              <strong>Başlık:</strong> {announcement.BASLIK}
+            </p>
+            <p>
+              <strong>Başlama Tarihi:</strong>{" "}
+              {new Date(announcement.BASLAMA_TARIHI).toLocaleString()}
+            </p>
+            <p>
+              <strong>Bitiş Tarihi:</strong>{" "}
+              {new Date(announcement.BITIS_TARIHI).toLocaleString()}
+            </p>
           </div>
         ))}
       </div>
@@ -127,12 +151,24 @@ export default async function Home() {
       <div className="max-h-96 overflow-y-auto border border-gray-200 rounded-lg p-4">
         {busRoutes.map((route) => (
           <div key={route._id} className="mb-4 pb-4 border-b border-gray-200">
-            <p><strong>Hat No:</strong> {route.HAT_NO}</p>
-            <p><strong>Hat Adı:</strong> {route.HAT_ADI}</p>
-            <p><strong>Güzergah Açıklama:</strong> {route.GUZERGAH_ACIKLAMA}</p>
-            <p><strong>Açıklama:</strong> {route.ACIKLAMA}</p>
-            <p><strong>Hat Başlangıç:</strong> {route.HAT_BASLANGIC}</p>
-            <p><strong>Hat Bitiş:</strong> {route.HAT_BITIS}</p>
+            <p>
+              <strong>Hat No:</strong> {route.HAT_NO}
+            </p>
+            <p>
+              <strong>Hat Adı:</strong> {route.HAT_ADI}
+            </p>
+            <p>
+              <strong>Güzergah Açıklama:</strong> {route.GUZERGAH_ACIKLAMA}
+            </p>
+            <p>
+              <strong>Açıklama:</strong> {route.ACIKLAMA}
+            </p>
+            <p>
+              <strong>Hat Başlangıç:</strong> {route.HAT_BASLANGIC}
+            </p>
+            <p>
+              <strong>Hat Bitiş:</strong> {route.HAT_BITIS}
+            </p>
           </div>
         ))}
       </div>

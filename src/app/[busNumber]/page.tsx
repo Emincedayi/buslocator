@@ -16,13 +16,28 @@ interface Props {
   }>;
 }
 
+interface BusSchedule {
+  _id: number;
+  HAT_NO: number;
+  TARIFE_ID: number;
+  GIDIS_SAATI: string;
+  DONUS_SAATI: string;
+  SIRA: number;
+  GIDIS_ENGELLI_DESTEGI: string;
+  DONUS_ENGELLI_DESTEGI: string;
+  BISIKLETLI_GIDIS: string;
+  BISIKLETLI_DONUS: string;
+  GIDIS_ELEKTRIKLI_OTOBUS: string;
+  DONUS_ELEKTRIKLI_OTOBUS: string;
+}
+
 const BusPage = ({ params }: Props) => {
   // `React.use` ile `params` Promise'ini çöz
   const { busNumber } = React.use(params);
 
   const [busLocations, setBusLocations] = useState<BusLocation[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [setBusData] = useState<any>(null); // Otobüs verisini tutacak state
+  const [busData, setBusData] = useState<BusSchedule | null>(null); // Otobüs verisini tutacak state
 
   useEffect(() => {
     const fetchBusLocations = async () => {
@@ -62,8 +77,9 @@ const BusPage = ({ params }: Props) => {
         }
 
         const data = await res.json();
-        setBusData(data.result.records || []);
+        setBusData(data.result.records);
         console.log("Otobüs Verileri:", data.result.records || []); // Terminalde görmek için log
+        console.log(busData);
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Bilinmeyen bir hata oluştu."
