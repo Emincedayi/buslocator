@@ -22,7 +22,7 @@ const BusPage = ({ params }: Props) => {
 
   const [busLocations, setBusLocations] = useState<BusLocation[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [busData, setBusData] = useState<any>(null); // Otobüs verisini tutacak state
+  const [setBusData] = useState<any>(null); // Otobüs verisini tutacak state
 
   useEffect(() => {
     const fetchBusLocations = async () => {
