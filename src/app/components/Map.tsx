@@ -19,7 +19,8 @@ interface BusLocation {
   OtobusId: number;
   Yon: number;
   KoorY: string; // Boylam olarak düzeltilmiş
-  KoorX: string; // Enlem olarak düzeltilmiş
+  KoorX: string; // Enlem olarak düzeltilmiş 
+
 }
 
 interface MapProps {
