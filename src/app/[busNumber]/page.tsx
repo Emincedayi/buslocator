@@ -22,6 +22,7 @@ const BusPage = ({ params }: Props) => {
 
   const [busLocations, setBusLocations] = useState<BusLocation[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [busData, setBusData] = useState<any>(null); // Otobüs verisini tutacak state
 
   useEffect(() => {
     const fetchBusLocations = async () => {
@@ -37,6 +38,7 @@ const BusPage = ({ params }: Props) => {
 
         const data = await res.json();
         setBusLocations(data.HatOtobusKonumlari || []);
+        console.log("Otobüs Konumları:", data.HatOtobusKonumlari || []); // Terminalde görmek için log
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Bilinmeyen bir hata oluştu."
@@ -47,10 +49,35 @@ const BusPage = ({ params }: Props) => {
     fetchBusLocations();
   }, [busNumber]);
 
+  // Otobüs verilerini çekme
+  useEffect(() => {
+    const fetchBusData = async () => {
+      try {
+        const res = await fetch(
+          "https://acikveri.bizizmir.com/tr/api/3/action/datastore_search?resource_id=c6fa6046-f755-47d7-b69e-db6bb06a8b5a&limit=50"
+        );
+
+        if (!res.ok) {
+          throw new Error("Veri çekme hatası.");
+        }
+
+        const data = await res.json();
+        setBusData(data.result.records || []);
+        console.log("Otobüs Verileri:", data.result.records || []); // Terminalde görmek için log
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Bilinmeyen bir hata oluştu."
+        );
+      }
+    };
+
+    fetchBusData();
+  }, []);
+
   if (error) {
     return <div>Hata: {error}</div>;
   }
-  console.log(busLocations);
+
   return (
     <div>
       <h1>Otobüs {busNumber} Konumları</h1>
