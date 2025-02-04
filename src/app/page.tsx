@@ -3,8 +3,33 @@
 import { useState, useEffect } from "react";
 import Map from "./components/Map";
 
+// Define types for bus details and other data structures
+interface BusDetails {
+  HAT_NO: string;
+  TARIFE_ID: string;
+  GIDIS_SAATI: string;
+  DONUS_SAATI: string;
+  SIRA: string;
+}
+
+interface AdditionalBusDetails {
+  HAT_NO: string;
+  BASLIK: string;
+  BASLAMA_TARIHI: string;
+  BITIS_TARIHI: string;
+}
+
+interface ExtraBusDetails {
+  HAT_NO: string;
+  HAT_ADI: string;
+  GUZERGAH_ACIKLAMA: string;
+  ACIKLAMA: string;
+  HAT_BASLANGIC: string;
+  HAT_BITIS: string;
+}
+
 // Otobüs konumlarını getiren fonksiyon
-async function fetchBusLocations(hatNo, setBusLocations) {
+async function fetchBusLocations(hatNo: string, setBusLocations: React.Dispatch<React.SetStateAction<any[]>>) {
   if (!hatNo) return;
   try {
     const res = await fetch(
@@ -20,7 +45,7 @@ async function fetchBusLocations(hatNo, setBusLocations) {
 }
 
 // Otobüs detaylarını getiren fonksiyon
-async function fetchBusDetails(setBusDetails) {
+async function fetchBusDetails(setBusDetails: React.Dispatch<React.SetStateAction<BusDetails[]>>) {
   try {
     const res = await fetch(
       "https://acikveri.bizizmir.com/tr/api/3/action/datastore_search?resource_id=c6fa6046-f755-47d7-b69e-db6bb06a8b5a&limit=50",
@@ -35,7 +60,7 @@ async function fetchBusDetails(setBusDetails) {
 }
 
 // Yeni verileri çeken fonksiyon
-async function fetchAdditionalBusDetails(setAdditionalBusDetails) {
+async function fetchAdditionalBusDetails(setAdditionalBusDetails: React.Dispatch<React.SetStateAction<AdditionalBusDetails[]>>) {
   try {
     const res = await fetch(
       "https://acikveri.bizizmir.com/tr/api/3/action/datastore_search?resource_id=aeafda53-3db8-46fa-abe3-47b773fc8b90&limit=50",
@@ -50,7 +75,7 @@ async function fetchAdditionalBusDetails(setAdditionalBusDetails) {
 }
 
 // Yeni link için verileri çeken fonksiyon
-async function fetchExtraBusDetails(setExtraBusDetails) {
+async function fetchExtraBusDetails(setExtraBusDetails: React.Dispatch<React.SetStateAction<ExtraBusDetails[]>>) {
   try {
     const res = await fetch(
       "https://acikveri.bizizmir.com/tr/api/3/action/datastore_search?resource_id=bd6c84f8-49ba-4cf4-81f8-81a0fbb5caa3&limit=5",
@@ -65,14 +90,14 @@ async function fetchExtraBusDetails(setExtraBusDetails) {
 }
 
 export default function Home() {
-  const [busLocations, setBusLocations] = useState([]);
-  const [busDetails, setBusDetails] = useState([]);
-  const [additionalBusDetails, setAdditionalBusDetails] = useState([]);
-  const [extraBusDetails, setExtraBusDetails] = useState([]);
-  const [hatNo, setHatNo] = useState("");
-  const [busSearchTerm, setBusSearchTerm] = useState(""); // Otobüs arama terimi
-  const [additionalBusSearchTerm, setAdditionalBusSearchTerm] = useState(""); // Ek otobüs arama terimi
-  const [extraBusSearchTerm, setExtraBusSearchTerm] = useState(""); // Ekstra otobüs arama terimi
+  const [busLocations, setBusLocations] = useState<any[]>([]);
+  const [busDetails, setBusDetails] = useState<BusDetails[]>([]);
+  const [additionalBusDetails, setAdditionalBusDetails] = useState<AdditionalBusDetails[]>([]);
+  const [extraBusDetails, setExtraBusDetails] = useState<ExtraBusDetails[]>([]);
+  const [hatNo, setHatNo] = useState<string>("");
+  const [busSearchTerm, setBusSearchTerm] = useState<string>(""); // Otobüs arama terimi
+  const [additionalBusSearchTerm, setAdditionalBusSearchTerm] = useState<string>(""); // Ek otobüs arama terimi
+  const [extraBusSearchTerm, setExtraBusSearchTerm] = useState<string>(""); // Ekstra otobüs arama terimi
 
   // Otobüs detaylarını sayfa yüklendiğinde bir kere çek
   useEffect(() => {
@@ -180,7 +205,7 @@ export default function Home() {
                 <p><strong>Hat No:</strong> {bus.HAT_NO}</p>
                 <p><strong>Başlık:</strong> {bus.BASLIK}</p>
                 <p><strong>Başlama Tarihi:</strong> {bus.BASLAMA_TARIHI}</p>
-                <p><strong>Bitiş Tarihi:</strong> {bus.BITIS_TARIHI}</p>
+                <p><strong>Bitis Tarihi:</strong> {bus.BITIS_TARIHI}</p>
               </div>
             ))
           )}
@@ -197,7 +222,7 @@ export default function Home() {
             padding: 10,
           }}
         >
-          <h2 style={{ textAlign: "center" }}>Bilgilendirme</h2>
+          <h2 style={{ textAlign: "center" }}>Ekstra Otobüs Detayları</h2>
           <input
             type="text"
             placeholder="Hat numarası ara"
@@ -215,12 +240,11 @@ export default function Home() {
                 <p><strong>Güzergah Açıklama:</strong> {bus.GUZERGAH_ACIKLAMA}</p>
                 <p><strong>Açıklama:</strong> {bus.ACIKLAMA}</p>
                 <p><strong>Başlangıç:</strong> {bus.HAT_BASLANGIC}</p>
-                <p><strong>Bitiş:</strong> {bus.HAT_BITIS}</p>
+                <p><strong>Bitiriş:</strong> {bus.HAT_BITIS}</p>
               </div>
             ))
           )}
         </div>
-
       </div>
     </div>
   );
