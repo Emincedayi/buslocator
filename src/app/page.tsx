@@ -1,140 +1,226 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Map from "./components/Map";
 
-// Define the type for bus locations
-interface BusLocation {
-  HAT_NO: string;
-  PLAKA: string;
-  BOYlam: number;
-  ENlem: number;
-  HIZ: number;
-  HAREKET_YONU: number;
-  ISTASYON: string;
-  KAPALI_MI: boolean;
+// Otobüs konumlarını getiren fonksiyon
+async function fetchBusLocations(hatNo, setBusLocations) {
+  if (!hatNo) return;
+  try {
+    const res = await fetch(
+      `https://openapi.izmir.bel.tr/api/iztek/hatotobuskonumlari/${hatNo}`,
+      { cache: "no-store" }
+    );
+    const data = await res.json();
+    console.log("Otobüs Konumları:", data.HatOtobusKonumlari);
+    setBusLocations(data.HatOtobusKonumlari || []);
+  } catch (error) {
+    console.error("Otobüs konumları çekilirken hata oluştu:", error);
+  }
 }
 
-// Define the type for bus schedules
-interface BusSchedule {
-  _id: string;
-  HAT_NO: string;
-  TARIFE_ID: string;
-  GIDIS_SAATI: string;
-  DONUS_SAATI: string;
+// Otobüs detaylarını getiren fonksiyon
+async function fetchBusDetails(setBusDetails) {
+  try {
+    const res = await fetch(
+      "https://acikveri.bizizmir.com/tr/api/3/action/datastore_search?resource_id=c6fa6046-f755-47d7-b69e-db6bb06a8b5a&limit=50",
+      { cache: "no-store" }
+    );
+    const data = await res.json();
+    console.log("Otobüs Detayları:", data.result.records);
+    setBusDetails(data.result.records || []);
+  } catch (error) {
+    console.error("Otobüs detayları çekilirken hata oluştu:", error);
+  }
 }
 
-// Define the type for bus announcements
-interface BusAnnouncement {
-  _id: string;
-  HAT_NO: string;
-  BASLIK: string;
-  BASLAMA_TARIHI: string;
-  BITIS_TARIHI: string;
+// Yeni verileri çeken fonksiyon
+async function fetchAdditionalBusDetails(setAdditionalBusDetails) {
+  try {
+    const res = await fetch(
+      "https://acikveri.bizizmir.com/tr/api/3/action/datastore_search?resource_id=aeafda53-3db8-46fa-abe3-47b773fc8b90&limit=50",
+      { cache: "no-store" }
+    );
+    const data = await res.json();
+    console.log("Ek Otobüs Detayları:", data.result.records);
+    setAdditionalBusDetails(data.result.records || []);
+  } catch (error) {
+    console.error("Ek otobüs detayları çekilirken hata oluştu:", error);
+  }
 }
 
-// Define the type for bus routes
-interface BusRoute {
-  _id: string;
-  HAT_NO: string;
-  HAT_ADI: string;
-  GUZERGAH_ACIKLAMA: string;
-  ACIKLAMA: string;
-  HAT_BASLANGIC: string;
-  HAT_BITIS: string;
+// Yeni link için verileri çeken fonksiyon
+async function fetchExtraBusDetails(setExtraBusDetails) {
+  try {
+    const res = await fetch(
+      "https://acikveri.bizizmir.com/tr/api/3/action/datastore_search?resource_id=bd6c84f8-49ba-4cf4-81f8-81a0fbb5caa3&limit=5",
+      { cache: "no-store" }
+    );
+    const data = await res.json();
+    console.log("Ekstra Otobüs Detayları:", data.result.records);
+    setExtraBusDetails(data.result.records || []);
+  } catch (error) {
+    console.error("Ekstra otobüs detayları çekilirken hata oluştu:", error);
+  }
 }
 
-// Fetch bus locations
-async function getBusLocations(): Promise<BusLocation[]> {
-  const res = await fetch(
-    "https://openapi.izmir.bel.tr/api/iztek/hatotobuskonumlari/423",
-    {
-      cache: "no-store",
-    }
+export default function Home() {
+  const [busLocations, setBusLocations] = useState([]);
+  const [busDetails, setBusDetails] = useState([]);
+  const [additionalBusDetails, setAdditionalBusDetails] = useState([]);
+  const [extraBusDetails, setExtraBusDetails] = useState([]);
+  const [hatNo, setHatNo] = useState("");
+  const [busSearchTerm, setBusSearchTerm] = useState(""); // Otobüs arama terimi
+  const [additionalBusSearchTerm, setAdditionalBusSearchTerm] = useState(""); // Ek otobüs arama terimi
+  const [extraBusSearchTerm, setExtraBusSearchTerm] = useState(""); // Ekstra otobüs arama terimi
+
+  // Otobüs detaylarını sayfa yüklendiğinde bir kere çek
+  useEffect(() => {
+    fetchBusDetails(setBusDetails);
+    fetchAdditionalBusDetails(setAdditionalBusDetails); // Ek verileri çek
+    fetchExtraBusDetails(setExtraBusDetails); // Yeni verileri çek
+  }, []);
+
+  // Otobüs konumlarını sadece hatNo değiştiğinde çek
+  useEffect(() => {
+    fetchBusLocations(hatNo, setBusLocations);
+  }, [hatNo]);
+
+  // HAT_NO'ya göre filtreleme fonksiyonu
+  const filteredBusDetails = busDetails.filter(bus =>
+    bus.HAT_NO.toString().includes(busSearchTerm)
   );
-  const data = await res.json();
-  return data.HatOtobusKonumlari || [];
-}
 
-// Fetch bus schedules
-async function getBusSchedules(): Promise<BusSchedule[]> {
-  const res = await fetch(
-    "https://acikveri.bizizmir.com/tr/api/3/action/datastore_search?resource_id=c6fa6046-f755-47d7-b69e-db6bb06a8b5a&limit=50"
+  const filteredAdditionalBusDetails = additionalBusDetails.filter(bus =>
+    bus.HAT_NO.toString().includes(additionalBusSearchTerm)
   );
-  const data = await res.json();
-  return data.result.records || [];
-}
 
-// Fetch bus announcements
-async function getBusAnnouncements(): Promise<BusAnnouncement[]> {
-  const res = await fetch(
-    "https://acikveri.bizizmir.com/tr/api/3/action/datastore_search?resource_id=aeafda53-3db8-46fa-abe3-47b773fc8b90&limit=50"
+  const filteredExtraBusDetails = extraBusDetails.filter(bus =>
+    bus.HAT_NO.toString().includes(extraBusSearchTerm)
   );
-  const data = await res.json();
-  return data.result.records || [];
-}
-
-// Fetch bus routes
-async function getBusRoutes(): Promise<BusRoute[]> {
-  const res = await fetch(
-    "https://acikveri.bizizmir.com/tr/api/3/action/datastore_search?resource_id=bd6c84f8-49ba-4cf4-81f8-81a0fbb5caa3&limit=50"
-  );
-  const data = await res.json();
-  return data.result.records || [];
-}
-
-export default async function Home() {
-  const busLocations: BusLocation[] = await getBusLocations();
-  const busSchedules: BusSchedule[] = await getBusSchedules();
-  const busAnnouncements: BusAnnouncement[] = await getBusAnnouncements();
-  const busRoutes: BusRoute[] = await getBusRoutes();
-
-  // busLocations'ı Map bileşenine uygun hale getir
-  const formattedBusLocations = busLocations.map((bus) => ({
-    OtobusId: parseInt(bus.PLAKA.replace(/\D/g, ""), 10) || Math.random(), // Plaka numarasını sayıya çevir, yoksa rastgele bir ID kullan
-    Yon: bus.HAREKET_YONU, // Hareket yönünü aktarıyoruz
-    KoorY: bus.BOYlam.toString(), // Boylamı string olarak aktarıyoruz
-    KoorX: bus.ENlem.toString(), // Enlemi string olarak aktarıyoruz
-  }));
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">İzmir Otobüs Konumları</h1>
-      <Map busLocations={formattedBusLocations} />
-
-      <h2 className="text-xl font-bold mt-6 mb-4">Otobüs Tarifeleri</h2>
-      <div className="max-h-96 overflow-y-auto border border-gray-200 rounded-lg p-4 mb-6">
-        {busSchedules.map((schedule) => (
-          <div key={schedule._id} className="mb-4 pb-4 border-b border-gray-200">
-            <p><strong>Hat No:</strong> {schedule.HAT_NO}</p>
-            <p><strong>Tarife ID:</strong> {schedule.TARIFE_ID}</p>
-            <p><strong>Gidiş Saati:</strong> {schedule.GIDIS_SAATI}</p>
-            <p><strong>Dönüş Saati:</strong> {schedule.DONUS_SAATI}</p>
-          </div>
-        ))}
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: 20 }}>
+      <h1>İzmir Otobüs Konumları</h1>
+      <div style={{ marginBottom: 20 }}>
+        <input
+          type="text"
+          placeholder="Otobüs hattı numarasını girin"
+          style={{ color: "black", padding: 8, borderRadius: 5 }}
+          value={hatNo}
+          onChange={(e) => setHatNo(e.target.value)}
+        />
       </div>
 
-      <h2 className="text-xl font-bold mt-6 mb-4">Otobüs Duyuruları</h2>
-      <div className="max-h-96 overflow-y-auto border border-gray-200 rounded-lg p-4 mb-6">
-        {busAnnouncements.map((announcement) => (
-          <div key={announcement._id} className="mb-4 pb-4 border-b border-gray-200">
-            <p><strong>Hat No:</strong> {announcement.HAT_NO}</p>
-            <p><strong>Başlık:</strong> {announcement.BASLIK}</p>
-            <p><strong>Başlama Tarihi:</strong> {new Date(announcement.BASLAMA_TARIHI).toLocaleString()}</p>
-            <p><strong>Bitiş Tarihi:</strong> {new Date(announcement.BITIS_TARIHI).toLocaleString()}</p>
-          </div>
-        ))}
-      </div>
+      {/* Otobüs Konumları */}
+      <Map busLocations={busLocations} />
 
-      <h2 className="text-xl font-bold mt-6 mb-4">Otobüs Hat Bilgileri</h2>
-      <div className="max-h-96 overflow-y-auto border border-gray-200 rounded-lg p-4">
-        {busRoutes.map((route) => (
-          <div key={route._id} className="mb-4 pb-4 border-b border-gray-200">
-            <p><strong>Hat No:</strong> {route.HAT_NO}</p>
-            <p><strong>Hat Adı:</strong> {route.HAT_ADI}</p>
-            <p><strong>Güzergah Açıklama:</strong> {route.GUZERGAH_ACIKLAMA}</p>
-            <p><strong>Açıklama:</strong> {route.ACIKLAMA}</p>
-            <p><strong>Hat Başlangıç:</strong> {route.HAT_BASLANGIC}</p>
-            <p><strong>Hat Bitiş:</strong> {route.HAT_BITIS}</p>
-          </div>
-        ))}
+      {/* Otobüs Detayları ve Ek Detaylar (Yan Yana) */}
+      <div style={{ display: "flex", justifyContent: "space-around", width: "100%", marginTop: 20 }}>
+
+        {/* Otobüs Detayları */}
+        <div
+          style={{
+            width: "300px",
+            maxHeight: "300px",
+            overflowY: "auto",
+            border: "1px solid gray",
+            borderRadius: 5,
+            padding: 10,
+            marginRight: 20,
+          }}
+        >
+          <h2 style={{ textAlign: "center" }}>Otobüs Detayları</h2>
+          <input
+            type="text"
+            placeholder="Hat numarası ara"
+            style={{ padding: 8, borderRadius: 5, color: "black", marginBottom: 10 }}
+            value={busSearchTerm}
+            onChange={(e) => setBusSearchTerm(e.target.value)}
+          />
+          {filteredBusDetails.length === 0 ? (
+            <p>Yükleniyor...</p>
+          ) : (
+            filteredBusDetails.map((bus, index) => (
+              <div key={index} style={{ borderBottom: "1px solid gray", padding: 10 }}>
+                <p><strong>Hat No:</strong> {bus.HAT_NO}</p>
+                <p><strong>Tarife ID:</strong> {bus.TARIFE_ID}</p>
+                <p><strong>Gidiş Saati:</strong> {bus.GIDIS_SAATI}</p>
+                <p><strong>Dönüş Saati:</strong> {bus.DONUS_SAATI}</p>
+                <p><strong>Sıra:</strong> {bus.SIRA}</p>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Ek Otobüs Detayları */}
+        <div
+          style={{
+            width: "300px",
+            maxHeight: "300px",
+            overflowY: "auto",
+            border: "1px solid gray",
+            borderRadius: 5,
+            padding: 10,
+          }}
+        >
+          <h2 style={{ textAlign: "center" }}>Duyurular</h2>
+          <input
+            type="text"
+            placeholder="Hat numarası ara"
+            style={{ padding: 8, borderRadius: 5, color: "black", marginBottom: 10 }}
+            value={additionalBusSearchTerm}
+            onChange={(e) => setAdditionalBusSearchTerm(e.target.value)}
+          />
+          {filteredAdditionalBusDetails.length === 0 ? (
+            <p>Yükleniyor...</p>
+          ) : (
+            filteredAdditionalBusDetails.map((bus, index) => (
+              <div key={index} style={{ borderBottom: "1px solid gray", padding: 10 }}>
+                <p><strong>Hat No:</strong> {bus.HAT_NO}</p>
+                <p><strong>Başlık:</strong> {bus.BASLIK}</p>
+                <p><strong>Başlama Tarihi:</strong> {bus.BASLAMA_TARIHI}</p>
+                <p><strong>Bitiş Tarihi:</strong> {bus.BITIS_TARIHI}</p>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Ekstra Otobüs Detayları */}
+        <div
+          style={{
+            width: "300px",
+            maxHeight: "300px",
+            overflowY: "auto",
+            border: "1px solid gray",
+            borderRadius: 5,
+            padding: 10,
+          }}
+        >
+          <h2 style={{ textAlign: "center" }}>Bilgilendirme</h2>
+          <input
+            type="text"
+            placeholder="Hat numarası ara"
+            style={{ padding: 8, borderRadius: 5, color: "black", marginBottom: 10 }}
+            value={extraBusSearchTerm}
+            onChange={(e) => setExtraBusSearchTerm(e.target.value)}
+          />
+          {filteredExtraBusDetails.length === 0 ? (
+            <p>Yükleniyor...</p>
+          ) : (
+            filteredExtraBusDetails.map((bus, index) => (
+              <div key={index} style={{ borderBottom: "1px solid gray", padding: 10 }}>
+                <p><strong>Hat No:</strong> {bus.HAT_NO}</p>
+                <p><strong>Hat Adı:</strong> {bus.HAT_ADI}</p>
+                <p><strong>Güzergah Açıklama:</strong> {bus.GUZERGAH_ACIKLAMA}</p>
+                <p><strong>Açıklama:</strong> {bus.ACIKLAMA}</p>
+                <p><strong>Başlangıç:</strong> {bus.HAT_BASLANGIC}</p>
+                <p><strong>Bitiş:</strong> {bus.HAT_BITIS}</p>
+              </div>
+            ))
+          )}
+        </div>
+
       </div>
     </div>
   );

@@ -30,6 +30,7 @@ interface MapProps {
 const Map: React.FC<MapProps> = ({ busLocations }) => {
   useEffect(() => {
     console.log("Leaflet varsayılan ikonlar başarıyla yüklendi.");
+    console.log(busLocations)
   }, []);
 
   // Otobüsler için özel ikon
