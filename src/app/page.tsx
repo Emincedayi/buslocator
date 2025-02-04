@@ -28,8 +28,18 @@ interface ExtraBusDetails {
   HAT_BITIS: string;
 }
 
+interface BusLocation {
+  OtobusId: number;
+  Yon: number;
+  KoorY: string;
+  KoorX: string;
+}
+
 // Otobüs konumlarını getiren fonksiyon
-async function fetchBusLocations(hatNo: string, setBusLocations: React.Dispatch<React.SetStateAction<any[]>>) {
+async function fetchBusLocations(
+  hatNo: string,
+  setBusLocations: React.Dispatch<React.SetStateAction<BusLocation[]>>
+) {
   if (!hatNo) return;
   try {
     const res = await fetch(
@@ -45,7 +55,9 @@ async function fetchBusLocations(hatNo: string, setBusLocations: React.Dispatch<
 }
 
 // Otobüs detaylarını getiren fonksiyon
-async function fetchBusDetails(setBusDetails: React.Dispatch<React.SetStateAction<BusDetails[]>>) {
+async function fetchBusDetails(
+  setBusDetails: React.Dispatch<React.SetStateAction<BusDetails[]>>
+) {
   try {
     const res = await fetch(
       "https://acikveri.bizizmir.com/tr/api/3/action/datastore_search?resource_id=c6fa6046-f755-47d7-b69e-db6bb06a8b5a&limit=50",
@@ -60,7 +72,11 @@ async function fetchBusDetails(setBusDetails: React.Dispatch<React.SetStateActio
 }
 
 // Yeni verileri çeken fonksiyon
-async function fetchAdditionalBusDetails(setAdditionalBusDetails: React.Dispatch<React.SetStateAction<AdditionalBusDetails[]>>) {
+async function fetchAdditionalBusDetails(
+  setAdditionalBusDetails: React.Dispatch<
+    React.SetStateAction<AdditionalBusDetails[]>
+  >
+) {
   try {
     const res = await fetch(
       "https://acikveri.bizizmir.com/tr/api/3/action/datastore_search?resource_id=aeafda53-3db8-46fa-abe3-47b773fc8b90&limit=50",
@@ -75,7 +91,9 @@ async function fetchAdditionalBusDetails(setAdditionalBusDetails: React.Dispatch
 }
 
 // Yeni link için verileri çeken fonksiyon
-async function fetchExtraBusDetails(setExtraBusDetails: React.Dispatch<React.SetStateAction<ExtraBusDetails[]>>) {
+async function fetchExtraBusDetails(
+  setExtraBusDetails: React.Dispatch<React.SetStateAction<ExtraBusDetails[]>>
+) {
   try {
     const res = await fetch(
       "https://acikveri.bizizmir.com/tr/api/3/action/datastore_search?resource_id=bd6c84f8-49ba-4cf4-81f8-81a0fbb5caa3&limit=5",
@@ -90,13 +108,16 @@ async function fetchExtraBusDetails(setExtraBusDetails: React.Dispatch<React.Set
 }
 
 export default function Home() {
-  const [busLocations, setBusLocations] = useState<any[]>([]);
+  const [busLocations, setBusLocations] = useState<BusLocation[]>([]);
   const [busDetails, setBusDetails] = useState<BusDetails[]>([]);
-  const [additionalBusDetails, setAdditionalBusDetails] = useState<AdditionalBusDetails[]>([]);
+  const [additionalBusDetails, setAdditionalBusDetails] = useState<
+    AdditionalBusDetails[]
+  >([]);
   const [extraBusDetails, setExtraBusDetails] = useState<ExtraBusDetails[]>([]);
   const [hatNo, setHatNo] = useState<string>("");
   const [busSearchTerm, setBusSearchTerm] = useState<string>(""); // Otobüs arama terimi
-  const [additionalBusSearchTerm, setAdditionalBusSearchTerm] = useState<string>(""); // Ek otobüs arama terimi
+  const [additionalBusSearchTerm, setAdditionalBusSearchTerm] =
+    useState<string>(""); // Ek otobüs arama terimi
   const [extraBusSearchTerm, setExtraBusSearchTerm] = useState<string>(""); // Ekstra otobüs arama terimi
 
   // Otobüs detaylarını sayfa yüklendiğinde bir kere çek
@@ -112,20 +133,27 @@ export default function Home() {
   }, [hatNo]);
 
   // HAT_NO'ya göre filtreleme fonksiyonu
-  const filteredBusDetails = busDetails.filter(bus =>
+  const filteredBusDetails = busDetails.filter((bus) =>
     bus.HAT_NO.toString().includes(busSearchTerm)
   );
 
-  const filteredAdditionalBusDetails = additionalBusDetails.filter(bus =>
+  const filteredAdditionalBusDetails = additionalBusDetails.filter((bus) =>
     bus.HAT_NO.toString().includes(additionalBusSearchTerm)
   );
 
-  const filteredExtraBusDetails = extraBusDetails.filter(bus =>
+  const filteredExtraBusDetails = extraBusDetails.filter((bus) =>
     bus.HAT_NO.toString().includes(extraBusSearchTerm)
   );
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: 20 }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: 20,
+      }}
+    >
       <h1>İzmir Otobüs Konumları</h1>
       <div style={{ marginBottom: 20 }}>
         <input
@@ -141,8 +169,14 @@ export default function Home() {
       <Map busLocations={busLocations} />
 
       {/* Otobüs Detayları ve Ek Detaylar (Yan Yana) */}
-      <div style={{ display: "flex", justifyContent: "space-around", width: "100%", marginTop: 20 }}>
-
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-around",
+          width: "100%",
+          marginTop: 20,
+        }}
+      >
         {/* Otobüs Detayları */}
         <div
           style={{
@@ -159,7 +193,12 @@ export default function Home() {
           <input
             type="text"
             placeholder="Hat numarası ara"
-            style={{ padding: 8, borderRadius: 5, color: "black", marginBottom: 10 }}
+            style={{
+              padding: 8,
+              borderRadius: 5,
+              color: "black",
+              marginBottom: 10,
+            }}
             value={busSearchTerm}
             onChange={(e) => setBusSearchTerm(e.target.value)}
           />
@@ -167,12 +206,25 @@ export default function Home() {
             <p>Yükleniyor...</p>
           ) : (
             filteredBusDetails.map((bus, index) => (
-              <div key={index} style={{ borderBottom: "1px solid gray", padding: 10 }}>
-                <p><strong>Hat No:</strong> {bus.HAT_NO}</p>
-                <p><strong>Tarife ID:</strong> {bus.TARIFE_ID}</p>
-                <p><strong>Gidiş Saati:</strong> {bus.GIDIS_SAATI}</p>
-                <p><strong>Dönüş Saati:</strong> {bus.DONUS_SAATI}</p>
-                <p><strong>Sıra:</strong> {bus.SIRA}</p>
+              <div
+                key={index}
+                style={{ borderBottom: "1px solid gray", padding: 10 }}
+              >
+                <p>
+                  <strong>Hat No:</strong> {bus.HAT_NO}
+                </p>
+                <p>
+                  <strong>Tarife ID:</strong> {bus.TARIFE_ID}
+                </p>
+                <p>
+                  <strong>Gidiş Saati:</strong> {bus.GIDIS_SAATI}
+                </p>
+                <p>
+                  <strong>Dönüş Saati:</strong> {bus.DONUS_SAATI}
+                </p>
+                <p>
+                  <strong>Sıra:</strong> {bus.SIRA}
+                </p>
               </div>
             ))
           )}
@@ -193,7 +245,12 @@ export default function Home() {
           <input
             type="text"
             placeholder="Hat numarası ara"
-            style={{ padding: 8, borderRadius: 5, color: "black", marginBottom: 10 }}
+            style={{
+              padding: 8,
+              borderRadius: 5,
+              color: "black",
+              marginBottom: 10,
+            }}
             value={additionalBusSearchTerm}
             onChange={(e) => setAdditionalBusSearchTerm(e.target.value)}
           />
@@ -201,11 +258,22 @@ export default function Home() {
             <p>Yükleniyor...</p>
           ) : (
             filteredAdditionalBusDetails.map((bus, index) => (
-              <div key={index} style={{ borderBottom: "1px solid gray", padding: 10 }}>
-                <p><strong>Hat No:</strong> {bus.HAT_NO}</p>
-                <p><strong>Başlık:</strong> {bus.BASLIK}</p>
-                <p><strong>Başlama Tarihi:</strong> {bus.BASLAMA_TARIHI}</p>
-                <p><strong>Bitis Tarihi:</strong> {bus.BITIS_TARIHI}</p>
+              <div
+                key={index}
+                style={{ borderBottom: "1px solid gray", padding: 10 }}
+              >
+                <p>
+                  <strong>Hat No:</strong> {bus.HAT_NO}
+                </p>
+                <p>
+                  <strong>Başlık:</strong> {bus.BASLIK}
+                </p>
+                <p>
+                  <strong>Başlama Tarihi:</strong> {bus.BASLAMA_TARIHI}
+                </p>
+                <p>
+                  <strong>Bitis Tarihi:</strong> {bus.BITIS_TARIHI}
+                </p>
               </div>
             ))
           )}
@@ -226,7 +294,12 @@ export default function Home() {
           <input
             type="text"
             placeholder="Hat numarası ara"
-            style={{ padding: 8, borderRadius: 5, color: "black", marginBottom: 10 }}
+            style={{
+              padding: 8,
+              borderRadius: 5,
+              color: "black",
+              marginBottom: 10,
+            }}
             value={extraBusSearchTerm}
             onChange={(e) => setExtraBusSearchTerm(e.target.value)}
           />
@@ -234,13 +307,28 @@ export default function Home() {
             <p>Yükleniyor...</p>
           ) : (
             filteredExtraBusDetails.map((bus, index) => (
-              <div key={index} style={{ borderBottom: "1px solid gray", padding: 10 }}>
-                <p><strong>Hat No:</strong> {bus.HAT_NO}</p>
-                <p><strong>Hat Adı:</strong> {bus.HAT_ADI}</p>
-                <p><strong>Güzergah Açıklama:</strong> {bus.GUZERGAH_ACIKLAMA}</p>
-                <p><strong>Açıklama:</strong> {bus.ACIKLAMA}</p>
-                <p><strong>Başlangıç:</strong> {bus.HAT_BASLANGIC}</p>
-                <p><strong>Bitiriş:</strong> {bus.HAT_BITIS}</p>
+              <div
+                key={index}
+                style={{ borderBottom: "1px solid gray", padding: 10 }}
+              >
+                <p>
+                  <strong>Hat No:</strong> {bus.HAT_NO}
+                </p>
+                <p>
+                  <strong>Hat Adı:</strong> {bus.HAT_ADI}
+                </p>
+                <p>
+                  <strong>Güzergah Açıklama:</strong> {bus.GUZERGAH_ACIKLAMA}
+                </p>
+                <p>
+                  <strong>Açıklama:</strong> {bus.ACIKLAMA}
+                </p>
+                <p>
+                  <strong>Başlangıç:</strong> {bus.HAT_BASLANGIC}
+                </p>
+                <p>
+                  <strong>Bitiriş:</strong> {bus.HAT_BITIS}
+                </p>
               </div>
             ))
           )}
